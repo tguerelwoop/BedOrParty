@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tonight</title>
+
+<style>
+:root {
+  --bg: #fbfaf6;
+  --blue: #2aa7c9;
+  --pink: #f3a6b8;
+  --yellow: #f4c84a;
+  --green: #3fa66b;
+  --ink: #1e1e1e;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper {
+  text-align: center;
+}
+
+h1 {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+}
+
+canvas {
+  touch-action: none;
+}
+
+.note {
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <h1>scratch to decide</h1>
+    <canvas id="card" width="260" height="260"></canvas>
+    <div class="note">use your finger or mouse</div>
+  </div>
+
+<script>
+const canvas = document.getElementById("card");
+const ctx = canvas.getContext("2d");
+
+const size = canvas.width;
+const radius = size / 2;
+
+const outcome = Math.random() < 0.5 ? "BED" : "DRINK";
+const colors = {
+  BED: "#f3a6b8",
+  DRINK: "#2aa7c9"
+};
+
+// draw revealed layer
+ctx.save();
+ctx.beginPath();
+ctx.arc(radius, radius, radius - 4, 0, Math.PI * 2);
+ctx.clip();
+
+ctx.fillStyle = colors[outcome];
+ctx.fillRect(0, 0, size, size);
+
+ctx.fillStyle = "#1e1e1e";
+ctx.font = "600 36px system-ui";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillText(outcome, radius, radius);
+ctx.restore();
+
+// scratch layer
+ctx.globalCompositeOperation = "source-over";
+ctx.beginPath();
+ctx.arc(radius, radius, radius - 4, 0, Math.PI * 2);
+ctx.fillStyle = "#f4c84a";
+ctx.fill();
+
+// subtle grain dots
+for (let i = 0; i < 120; i++) {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.beginPath();
+  ctx.arc(
+    Math.random() * size,
+    Math.random() * size,
+    Math.random() * 1.5,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+}
+
+ctx.globalCompositeOperation = "destination-out";
+
+let scratching = false;
+
+function scratch(x, y) {
+  ctx.beginPath();
+  ctx.arc(x, y, 14, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+canvas.addEventListener("pointerdown", e => {
+  scratching = true;
+  scratch(e.offsetX, e.offsetY);
+});
+
+canvas.addEventListener("pointermove", e => {
+  if (!scratching) return;
+  scratch(e.offsetX, e.offsetY);
+});
+
+canvas.addEventListener("pointerup", () => scratching = false);
+canvas.addEventListener("pointerleave", () => scratching = false);
+</script>
+</body>
+</html>
