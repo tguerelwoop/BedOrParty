@@ -43,7 +43,7 @@ canvas {
 }
 
 .note {
-  margin-top: 20px;
+  margin-top: 18px;
   font-size: 12px;
   opacity: 0.6;
 }
@@ -51,130 +51,23 @@ canvas {
 </head>
 
 <body>
-  <div class="wrapper">
-    <h1>scratch to decide</h1>
-    <canvas id="card" width="260" height="260"></canvas>
-    <div class="note">use your finger or mouse</div>
-  </div>
+<div class="wrapper">
+  <h1>scratch to decide</h1>
+  <canvas id="card" width="260" height="260"></canvas>
+  <div class="note">use finger or mouse</div>
+</div>
 
 <script>
 const canvas = document.getElementById("card");
 const ctx = canvas.getContext("2d");
 
 const size = canvas.width;
-const radius = size / 2;
+const r = size / 2;
 
 const outcome = Math.random() < 0.5 ? "BED" : "DRINK";
-const colors = {
-  BED: "#f3a6b8",
-  DRINK: "#2aa7c9"
-};
+const colors = { BED: "#f3a6b8", DRINK: "#2aa7c9" };
 
-// revealed layer
+// --- draw revealed layer (bottom) ---
 ctx.save();
 ctx.beginPath();
-ctx.arc(radius, radius, radius - 4, 0, Math.PI * 2);
-ctx.clip();
-
-ctx.fillStyle = colors[outcome];
-ctx.fillRect(0, 0, size, size);
-
-ctx.fillStyle = "#1e1e1e";
-ctx.font = "600 38px system-ui";
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
-ctx.fillText(outcome, radius, radius);
-ctx.restore();
-
-// scratch layer
-ctx.globalCompositeOperation = "source-over";
-ctx.beginPath();
-ctx.arc(radius, radius, radius - 4, 0, Math.PI * 2);
-ctx.fillStyle = "#f4c84a";
-ctx.fill();
-
-// grain
-for (let i = 0; i < 140; i++) {
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.beginPath();
-  ctx.arc(
-    Math.random() * size,
-    Math.random() * size,
-    Math.random() * 1.6,
-    0,
-    Math.PI * 2
-  );
-  ctx.fill();
-}
-
-ctx.globalCompositeOperation = "destination-out";
-
-let scratching = false;
-let scratched = false;
-
-// stronger scratch
-function scratch(x, y) {
-  ctx.beginPath();
-  ctx.arc(x, y, 22, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// check cleared %
-function getClearedRatio() {
-  const image = ctx.getImageData(0, 0, size, size);
-  let cleared = 0;
-
-  for (let i = 3; i < image.data.length; i += 4) {
-    if (image.data[i] === 0) cleared++;
-  }
-
-  return cleared / (image.data.length / 4);
-}
-
-// auto fade
-function fadeOut() {
-  if (scratched) return;
-  scratched = true;
-
-  let alpha = 1;
-  const fade = setInterval(() => {
-    alpha -= 0.05;
-    ctx.globalCompositeOperation = "source-over";
-    ctx.clearRect(0, 0, size, size);
-
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.arc(radius, radius, radius - 4, 0, Math.PI * 2);
-    ctx.fillStyle = "#f4c84a";
-    ctx.fill();
-    ctx.restore();
-
-    ctx.globalCompositeOperation = "destination-out";
-
-    if (alpha <= 0) {
-      ctx.clearRect(0, 0, size, size);
-      clearInterval(fade);
-    }
-  }, 30);
-}
-
-canvas.addEventListener("pointerdown", e => {
-  scratching = true;
-  scratch(e.offsetX, e.offsetY);
-});
-
-canvas.addEventListener("pointermove", e => {
-  if (!scratching) return;
-  scratch(e.offsetX, e.offsetY);
-
-  if (getClearedRatio() > 0.45) {
-    fadeOut();
-  }
-});
-
-canvas.addEventListener("pointerup", () => scratching = false);
-canvas.addEventListener("pointerleave", () => scratching = false);
-</script>
-</body>
-</html>
+ctx.arc(r, r, r -
